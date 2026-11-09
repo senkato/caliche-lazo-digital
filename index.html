@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ALMA · Propuesta Lazo Digital · Grupo Caliche</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap">
+<style>
+:root{
+  --crema:#f8f5f0; --papel:#fffdf9; --tinta:#2e2a24; --tinta2:#6d6458; --mut:#a89d8e;
+  --line:#e6ddd0; --line2:#cfc2af; --oro:#c9a77c; --salvia:#7c9a92;
+  --rojo:#c8102e; --rojo-osc:#8f0e22; --verde:#1d6b3c; --dorado:#e0b64f; --noche:#0c1322;
+  --sombra:0 1px 2px rgba(46,42,36,.05),0 18px 40px -20px rgba(46,42,36,.3); --r:14px;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Montserrat,system-ui,sans-serif;font-size:14px;color:var(--tinta);background:var(--crema);
+  background-image:radial-gradient(110% 60% at 85% -5%,rgba(201,167,124,.14),transparent 60%),radial-gradient(80% 50% at -5% 108%,rgba(124,154,146,.12),transparent 55%);line-height:1.55}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;letter-spacing:.01em;margin:0}
+a{color:var(--rojo)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 26px}
+.topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:14px;padding:10px 26px;
+  background:rgba(248,245,240,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar .mark{font:600 1.05rem "Cormorant Garamond";letter-spacing:.14em;text-transform:uppercase}
+.topbar .mark em{font-style:normal;color:var(--oro)}
+.topbar .tag{font:600 .58rem Montserrat;letter-spacing:.18em;text-transform:uppercase;background:var(--rojo);color:#fff;padding:5px 9px;border-radius:6px}
+.topbar nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap}
+.topbar nav a{font:500 .68rem Montserrat;color:var(--tinta2);text-decoration:none;padding:6px 11px;border-radius:9px}
+.topbar nav a:hover{background:var(--papel);color:var(--tinta)}
+.hero{padding:50px 0 26px}
+.hero .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:44px;align-items:center}
+.hero h1{font-size:clamp(2.1rem,4.6vw,3.3rem);line-height:1.08}
+.hero h1 em{font-style:italic;color:var(--rojo)}
+.hero .eyebrow{font:600 .66rem Montserrat;letter-spacing:.22em;text-transform:uppercase;color:var(--oro);margin-bottom:16px}
+.hero p{color:var(--tinta2);max-width:46ch}
+.hero .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.chip{display:inline-flex;align-items:center;gap:7px;font:600 .66rem Montserrat;border:1px solid var(--line2);background:var(--papel);border-radius:999px;padding:7px 13px;color:var(--tinta2)}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--rojo)}
+.hero .night{border-radius:var(--r);overflow:hidden;box-shadow:var(--sombra);border:1px solid var(--line);margin:0}
+.hero .night img{width:100%;display:block}
+.hero .night figcaption{font:500 .62rem Montserrat;color:#cbb9a0;background:var(--noche);padding:8px 12px;display:flex;justify-content:space-between}
+.cta{display:inline-flex;align-items:center;gap:9px;background:var(--tinta);color:#f5efe4;text-decoration:none;font:600 .78rem Montserrat;padding:13px 22px;border-radius:11px;margin-top:22px;transition:.2s}
+.cta:hover{background:var(--rojo)}
+section{padding:42px 0}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-head .num{font:600 .62rem Montserrat;letter-spacing:.2em;color:var(--oro)}
+.sec-head h2{font-size:clamp(1.5rem,3vw,2.05rem)}
+.sec-lead{color:var(--tinta2);max-width:84ch;margin:0 0 20px}
+.card{background:var(--papel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sombra)}
+#visorWrap{position:relative;height:min(76vh,700px);border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#101822;box-shadow:var(--sombra)}
+#canvas3d{position:absolute;inset:0}
+#fall-back{position:absolute;inset:0;display:none;place-items:center;background:linear-gradient(180deg,#131c2c,#2c3138);color:#e8ddcb;font-size:.8rem;text-align:center;padding:30px}
+.vui{position:absolute;z-index:5;background:rgba(255,253,249,.94);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sombra)}
+.vui-label{font:600 .56rem Montserrat;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:0 0 6px}
+#vTime{left:14px;right:14px;bottom:12px;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#vTime .reloj{font:600 1.35rem "Cormorant Garamond";min-width:74px}
+#vTime input[type=range]{flex:1;min-width:170px;accent-color:var(--rojo)}
+#vTime .hitos{display:flex;gap:12px;font:500 .6rem Montserrat;color:var(--tinta2)}
+#vTime .hitos b{cursor:pointer;border-bottom:1px dotted var(--line2);font-weight:600;color:var(--tinta)}
+#vCtl{right:14px;top:14px;width:254px;padding:12px 14px;max-height:calc(100% - 96px);overflow:auto}
+.seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-bottom:6px}
+.seg button{flex:1;border:0;background:var(--papel);font:600 .58rem Montserrat;color:var(--tinta2);padding:6px 3px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--tinta);color:#f5efe4}
+.check{display:flex;gap:8px;align-items:center;font:500 .64rem Montserrat;color:var(--tinta2);cursor:pointer;padding:2px 0}
+.check input{accent-color:var(--rojo)}
+#vStats{left:14px;top:14px;padding:10px 14px;min-width:240px}
+#vStats .big{font:600 1.7rem "Cormorant Garamond";line-height:1}
+#vStats .veredicto{font:600 .62rem Montserrat;padding:3px 9px;border-radius:999px;color:#fff;display:inline-block;margin-top:7px}
+#vStats .sub{font:500 .6rem Montserrat;color:var(--tinta2);margin-top:6px;line-height:1.5}
+@media (max-width:900px){#vCtl{display:none}#visorWrap{height:60vh}}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:16px}
+.galeria figure{margin:0;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--sombra);cursor:pointer;position:relative}
+.galeria img{width:100%;height:150px;object-fit:cover;display:block}
+.galeria figcaption{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(12,19,34,.9));color:#f2e9d8;font:600 .6rem Montserrat;padding:22px 10px 8px}
+.compa{position:relative;border-radius:var(--r);overflow:hidden;box-shadow:var(--sombra);border:1px solid var(--line);user-select:none}
+.compa img{display:block;width:100%;height:clamp(300px,44vw,460px);object-fit:cover;pointer-events:none}
+.compa .capaInf{position:absolute;inset:0;overflow:hidden;clip-path:inset(0 0 0 45%)}
+.compa .asa{position:absolute;top:0;bottom:0;width:3px;background:#fff;left:45%;box-shadow:0 0 10px rgba(0,0,0,.6);cursor:ew-resize;z-index:3}
+.compa .asa::after{content:"◀ ▶";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;color:var(--tinta);
+  border-radius:999px;padding:8px 10px;font:600 .6rem Montserrat;white-space:nowrap;box-shadow:var(--sombra)}
+.compa .etq{position:absolute;top:12px;font:600 .6rem Montserrat;letter-spacing:.14em;text-transform:uppercase;padding:6px 11px;border-radius:999px;pointer-events:none;z-index:2}
+.compa .etq.l{left:12px;background:rgba(255,253,249,.85);color:var(--tinta)}
+.compa .etq.r{right:12px;background:rgba(12,19,34,.75);color:#ffd9a0}
+.grell{display:grid;grid-template-columns:1.1fr .9fr;gap:22px}
+@media (max-width:920px){.grell,.hero .grid{grid-template-columns:1fr}}
+.pad{padding:20px 22px}
+table.cmp{width:100%;border-collapse:collapse;font-size:.74rem}
+table.cmp th{font:600 .6rem Montserrat;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);text-align:left;padding:9px 10px;border-bottom:1px solid var(--line2)}
+table.cmp td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--tinta2)}
+table.cmp td:first-child{font-weight:600;color:var(--tinta)}
+table.cmp .b{color:var(--verde);font-weight:600}table.cmp .m{color:var(--rojo);font-weight:600}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:20px}
+.kpi{padding:16px 18px}
+.kpi .lab{font:600 .58rem Montserrat;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.kpi .val{font:600 1.75rem "Cormorant Garamond";line-height:1.1;margin-top:4px}
+.kpi .val small{font-size:.95rem;color:var(--mut)}
+.kpi .foot{font:500 .62rem Montserrat;color:var(--tinta2);margin-top:5px}
+@media (max-width:920px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.escenas{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media (max-width:920px){.escenas{grid-template-columns:repeat(2,1fr)}}
+.escena{padding:18px}
+.escena .sw{display:flex;gap:5px;margin:10px 0}
+.escena .sw i{width:22px;height:10px;border-radius:5px}
+.escena h3{font-size:1.22rem}
+.escena p{font-size:.68rem;color:var(--tinta2);margin:6px 0 0}
+.fases{counter-reset:f}
+.fase{display:grid;grid-template-columns:58px 1fr;gap:6px;padding:12px 0;border-bottom:1px dashed var(--line)}
+.fase::before{counter-increment:f;content:counter(f,decimal-leading-zero);font:600 1.5rem "Cormorant Garamond";color:var(--oro)}
+.fase h3{font-size:1.08rem;margin-bottom:2px}
+.fase p{font-size:.72rem;color:var(--tinta2);margin:0}
+.nota{border-left:4px solid var(--oro);background:rgba(201,167,124,.1);border-radius:10px;padding:13px 16px;font-size:.74rem;color:var(--tinta2)}
+.nota b{color:var(--tinta)}
+.planta{width:100%;height:auto;display:block}
+.planta text{font-family:Montserrat}
+footer{padding:28px 0 44px;border-top:1px solid var(--line);margin-top:18px}
+footer .gridf{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:.68rem;color:var(--mut)}
+footer .mark{font:600 1rem "Cormorant Garamond";letter-spacing:.14em;text-transform:uppercase;color:var(--tinta)}
+footer .mark em{font-style:normal;color:var(--oro)}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <span class="mark">ALMA<em>·</em>PROJECTS</span>
+  <span class="tag">Propuesta · Demo</span>
+  <nav>
+    <a href="#simulador">Simulador</a><a href="#dia">¿De día?</a><a href="#comparativa">Físico vs proyección</a>
+    <a href="#planta">Planteamiento</a><a href="#escenas">Otros eventos</a><a href="#fases">Fases</a>
+  </nav>
+</header>
+
+<div class="wrap">
+<section class="hero">
+  <div class="grid">
+    <div>
+      <div class="eyebrow">Grupo Caliche · Sede Central · Navidad 2026</div>
+      <h1>El lazo navideño de la sede,<br><em>proyectado sobre la fachada</em></h1>
+      <p>Una alternativa al lazo físico sin grúas, sin andamios ni riesgo en altura: dos proyectores dibujan el lazo —igual o muy
+      similar al actual— abrazando la esquina de la torre donde hoy van los dos logotipos. Con el mismo equipo, la fachada puede
+      vestirse de corporativo, de efeméride o de cualquier evento del año.</p>
+      <div class="chips">
+        <span class="chip"><i></i>Lazo actual: 6 + 6 m × 8 m de alto</span>
+        <span class="chip"><i style="background:var(--dorado)"></i>Replantado sobre su ortofoto real</span>
+        <span class="chip"><i style="background:var(--salvia)"></i>Reutilizable los 365 días</span>
+      </div>
+      <a class="cta" href="#simulador">▶ Probar el simulador: de las 9:00 a la medianoche</a>
+    </div>
+    <figure class="night">
+      <img src="assets/lazo_v.jpg" alt="Lazo físico nocturno sobre la torre de Grupo Caliche">
+      <figcaption><span>Lazo físico · montaje de temporada (referencia del cliente)</span><span>1/4</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="simulador">
+  <div class="sec-head"><span class="num">01</span><h2>Simulador del entorno real</h2></div>
+  <p class="sec-lead">Volumen replantado con las medidas de la ortofoto: torre de cristal en el extremo noroeste del volumen (44 × 30 m),
+  fachada principal orientada <b>al suroeste</b>, porche de columnas, jardín de entrada con palmeras, carretera con rotonda
+  (la de la estrella) y las naves fotovoltaicas al este. Mueva la <b>hora del día</b>: el contraste del lazo proyectado se calcula
+  sobre la reflectancia real del cristal oscuro. Las perspectivas coinciden con <b>sus fotografías</b>; gire con el ratón.</p>
+  <div id="visorWrap">
+    <div id="canvas3d"></div>
+    <div id="fall-back">Necesita conexión la primera vez para cargar el motor 3D.<br>El resto del documento funciona sin él.</div>
+    <div class="vui" id="vStats">
+      <div class="vui-label">Visibilidad a esta hora</div>
+      <div class="big" id="stPct">—</div>
+      <div class="veredicto" id="stVer" style="background:var(--verde)">—</div>
+      <div class="sub" id="stSub">—</div>
+    </div>
+    <div class="vui" id="vCtl">
+      <div class="vui-label">Perspectivas reales</div>
+      <div class="seg" id="segCam">
+        <button data-c="rotonda">Rotonda (00)</button><button data-c="calle" class="on">Calzada (01)</button><button data-c="este">Este (02)</button>
+      </div>
+      <div class="seg" id="segCam2"><button data-c="dron">Dron (lazo)</button><button data-c="cenital">Ortofoto</button></div>
+      <div class="vui-label" style="margin-top:12px">Equipo de proyección</div>
+      <div class="seg" id="segLum">
+        <button data-l="24000">1×24k</button><button data-l="40000" class="on">2×20k</button><button data-l="60000">2×30k láser</button>
+      </div>
+      <div class="seg" id="segDist">
+        <button data-d="26" class="on">Tiro 26 m</button><button data-d="34">Tiro 34 m</button>
+      </div>
+      <div class="vui-label" style="margin-top:12px">Opciones</div>
+      <label class="check"><input type="checkbox" id="chProy" checked> Proyectores y líneas de tiro</label>
+      <label class="check"><input type="checkbox" id="chFaena"> Lazo físico (comparar)</label>
+      <div class="vui-label" style="margin-top:12px">Puesta en escena</div>
+      <div class="seg" id="segEsc">
+        <button data-e="lazo" class="on">Lazo</button><button data-e="navidad">Navidad</button><button data-e="corp">Corporativo</button>
+      </div>
+      <div style="font:500 .58rem Montserrat;color:var(--mut);margin-top:8px">Arrastre: girar · rueda: zoom · botón derecho: desplazar</div>
+    </div>
+    <div class="vui" id="vTime">
+      <span class="reloj" id="reloj">19:30</span>
+      <input type="range" id="hora" min="7" max="24" step="0.1" value="19.5" aria-label="Hora del día">
+      <div class="hitos"><span>◐ <b data-h="9">9:00</b> · <b data-h="13">sol</b> · <b data-h="18.1">ocaso</b> · <b data-h="21">noche</b></span></div>
+    </div>
+  </div>
+  <div class="galeria">
+    <figure data-c="rotonda"><img src="assets/00_v.jpg" alt="Vista desde la rotonda"><figcaption>00 · rotonda de la estrella: esquina de la torre y porche</figcaption></figure>
+    <figure data-c="calle"><img src="assets/01_v.jpg" alt="Vista desde la calzada"><figcaption>01 · calzada sur: la fachada principal, con el jardín delante</figcaption></figure>
+    <figure data-c="este"><img src="assets/02_v.jpg" alt="Vista desde el sector este"><figcaption>02 · sector este: la torre al fondo; el muro recibe el sol de tarde</figcaption></figure>
+    <figure data-c="cenital"><img src="assets/ctx_03.jpg" alt="Ortofoto del entorno"><figcaption>03 · ortofoto: volumen 44 × 30 m, rotonda y naves al este</figcaption></figure>
+    <figure data-c="dron"><img src="assets/ctx_04.jpg" alt="Vista 3D oblicua del entorno"><figcaption>04 · vista 3D: orientación suroeste de la fachada del lazo</figcaption></figure>
+  </div>
+</section>
+
+<section id="dia">
+  <div class="sec-head"><span class="num">02</span><h2>¿Se verá de día? La respuesta honesta</h2></div>
+  <p class="sec-lead">Es su pregunta principal y la respondemos aquí: <b>ninguna proyección comercial es visible con sol directo sobre
+  una fachada de cristal oscuro</b>. Con nublado de tarde se intuye; desde el crepúsculo civil (≈18:10) es plenamente legible.
+  Y de día, el lazo físico actual tampoco «funciona» apagado: ambos lucen en la franja de tarde-noche — que es además cuando la
+  rotonda y la sede reciben todas las miradas. Un matiz a su favor: la fachada mira al suroeste, con el <b>ocaso a sus espaldas</b>;
+  al anochecer el muro es el primero de la zona en quedarse en sombra y el lazo proyectado «enciende» la puesta de sol.</p>
+  <div class="grell">
+    <div class="card pad">
+      <div class="vui-label">Contraste percibido del lazo proyectado · 2×20.000 lm · tiro 26 m · diciembre</div>
+      <svg id="curva" viewBox="0 0 640 300" style="width:100%;height:auto"></svg>
+      <div class="nota" style="margin-top:8px"><b>La proyección además hace cosas que el LED fijo no:</b> respirar, animar el brillo
+      tipo paillette, intensificarse en las horas de más tráfico de la rotonda y apagarse sola de madrugada. Sensor crepuscular +
+      horario 18:00–00:30, control desde el móvil.</div>
+    </div>
+    <div>
+      <div class="compa" id="compa">
+        <img src="assets/fachada_v.jpg" alt="Fachada de día desde la calzada">
+        <div class="capaInf" id="capaInf"><img src="assets/lazo_v.jpg" alt="Lazo físico al anochecer"></div>
+        <div class="asa" id="asa"></div>
+        <span class="etq l">De día · estado habitual</span><span class="etq r">Anochecer · lazo físico</span>
+      </div>
+      <p style="font-size:.66rem;color:var(--mut);margin-top:9px">Arrastre la manecilla: de día el protagonismo de la fachada lo llevan
+      los logotipos y el porche, con o sin lazo.</p>
+    </div>
+  </div>
+  <div class="kpis">
+    <div class="kpi card"><div class="lab">Sol de mediodía</div><div class="val" style="color:var(--rojo)">&lt; 5 %</div><div class="foot">contraste sobre cristal oscuro · no apreciable con ningún equipo del mercado</div></div>
+    <div class="kpi card"><div class="lab">Nublado de tarde</div><div class="val">10–18 %</div><div class="foot">se intuye la forma; no es el escenario de venta</div></div>
+    <div class="kpi card"><div class="lab">Crepúsculo civil</div><div class="val" style="color:var(--verde)">40 %+</div><div class="foot">visible y legible desde la rotonda · 18:10–18:50</div></div>
+    <div class="kpi card"><div class="lab">Noche</div><div class="val" style="color:var(--verde)">×30</div><div class="foot">escena objetivo: rojo pleno con brillo de partículas, como su foto aérea</div></div>
+  </div>
+</section>
+
+<section id="comparativa">
+  <div class="sec-head"><span class="num">03</span><h2>Lazo físico vs proyección</h2></div>
+  <p class="sec-lead">Ambos dan la imagen nocturna que la sede ya ofrece cada Navidad. La diferencia está en el resto del año, la seguridad y la flexibilidad.</p>
+  <div class="card" style="overflow:hidden"><table class="cmp">
+    <thead><tr><th style="width:22%">Criterio</th><th style="width:39%">Lazo físico (LED) — estado actual</th><th>Proyección sobre fachada (propuesta)</th></tr></thead>
+    <tbody>
+      <tr><td>Montaje</td><td class="m">Grúa/plataforma cada temporada; trabajos en altura sobre el porche y accesos</td><td class="b">Sin intervenir en fachada: pies de proyección en la calzada/jardín con permiso</td></tr>
+      <tr><td>Coste recurrente</td><td class="m">Medios auxiliares + montaje/desmontaje + almacenaje del lazo</td><td class="b">Alquiler de temporada o amortización si se compra; sin grúa</td></tr>
+      <tr><td>Imagen nocturna</td><td class="n">La referencia que nos ha enviado: brillo de LED muy logrado</td><td class="n">La misma silueta 6+6×8 m, con partículas de brillo animables</td></tr>
+      <tr><td>Flexibilidad</td><td class="m">Un único diseño: el lazo</td><td class="b">Lazo, logotipo, felicitaciones, lazos solidarios, efemérides: ilimitado</td></tr>
+      <tr><td>Mantenimiento</td><td class="m">Tramos de LED fundidos cada temporada; gestión de piezas almacenadas</td><td class="n">Equipo monitorizado; sustitución por contrato en 24–48 h</td></tr>
+      <tr><td>Fachada</td><td class="m">Anclajes y pasacables sobre el cerramiento: revisiones e impermeabilización</td><td class="b">Cero impactos sobre el edificio</td></tr>
+      <tr><td>Seguridad</td><td class="m">Estructura colgada sobre accesos en época de máximo tránsito</td><td class="n">Equipo en superficie, lastres y balizamiento</td></tr>
+      <tr><td>Electricidad</td><td class="n">Toma en cubierta, temporizador</td><td class="n">Cuadro dedicado ≈ 4–6 kW; se resuelve desde el porche con latiguillo homologado</td></tr>
+    </tbody></table></div>
+</section>
+
+<section id="planta">
+  <div class="sec-head"><span class="num">04</span><h2>Planteamiento sobre el entorno</h2></div>
+  <p class="sec-lead">Medidas escaladas de la ortofoto: fachada suroeste de 44 m; la esquina de la torre queda a 12–24 m de la
+  calzada, que es exactamente el tiro limpio que necesitamos. Los dos tiros propuestos (P1 al sur sobre el paño de la cara
+  carretera, P2 desde la glorieta sobre la cara jardín) <b>despejan palmeras, porche, coches y farolas</b>. Dos opciones de pie:
+  <b>A)</b> calzada/glorieta (permiso municipal de ocupación) o <b>B)</b> jardín propio con mástil de 3–4 m (sin permiso, más ángulo).
+  Se resuelve en la visita.</p>
+  <div class="card pad">
+  <svg class="planta" viewBox="0 0 980 520">
+    <defs><pattern id="hatch" width="7" height="7" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="7" stroke="#c8102e" stroke-width="1.6" opacity=".65"/></pattern></defs>
+    <!-- norte -->
+    <g stroke="#a89d8e" fill="#a89d8e"><line x1="915" y1="70" x2="915" y2="26" stroke-width="2"/><path d="M915 18 l7 14 h-14 z"/></g>
+    <text x="905" y="88" font-size="11" fill="#a89d8e" font-weight="700">N</text>
+    <!-- edificio (torre NO, ala NE...) -->
+    <g stroke="#2e2a24" stroke-width="2">
+      <rect x="250" y="90" width="430" height="150" fill="#fffdf9"/>
+      <rect x="150" y="90" width="100" height="150" fill="#2e2a24"/>
+    </g>
+    <text x="150" y="78" font-size="12" fill="#2e2a24" font-weight="700">TORRE CRISTAL (esquina de los logos)</text>
+    <text x="465" y="170" font-size="11" fill="#a89d8e" text-anchor="middle">ALA DE OFICINAS · bandas blancas (reflectancia ≈ 65 %) y cristal</text>
+    <!-- jardín -->
+    <rect x="120" y="240" width="560" height="58" fill="#eef0e6" stroke="#cfc2af"/>
+    <text x="140" y="262" font-size="10" fill="#6d6458" font-weight="600">JARDÍN DE ACCESO · palmeras y setos (opción B: mástil aquí)</text>
+    <circle cx="300" cy="272" r="7" fill="#7c9a92"/><circle cx="420" cy="266" r="6" fill="#7c9a92"/><circle cx="540" cy="274" r="7" fill="#7c9a92"/>
+    <!-- porche -->
+    <rect x="150" y="240" width="430" height="10" fill="#e6ddd0" stroke="#a89d8e"/>
+    <!-- valla+acera+carretera -->
+    <rect x="60" y="300" width="860" height="26" fill="#e6ddd0"/>
+    <text x="72" y="318" font-size="9.5" fill="#6d6458">acera / bordillo</text>
+    <rect x="60" y="326" width="860" height="66" fill="#d8d2c6"/>
+    <line x1="60" y1="359" x2="700" y2="359" stroke="#fff" stroke-width="2.2" stroke-dasharray="24 16"/>
+    <g fill="#fff"><rect x="620" y="330" width="5" height="58"/><rect x="632" y="330" width="5" height="58"/><rect x="644" y="330" width="5" height="58"/><rect x="656" y="330" width="5" height="58"/></g>
+    <text x="72" y="345" font-size="10" fill="#fff" font-weight="600">CARRETERA (2 carriles)</text>
+    <!-- rotonda -->
+    <circle cx="120" cy="392" r="86" fill="#d8d2c6" stroke="#a89d8e"/>
+    <circle cx="120" cy="392" r="60" fill="#e8ecdc" stroke="#b9b2a6" stroke-width="9"/>
+    <path d="M120 348 l9.5 27.6 29.2 .4 -23.6 17.4 9 28.2 -23.1-16.9 -23.1 16.9 9-28.2 -23.6-17.4 29.2-.4 z" fill="#c8836f" opacity=".85"/>
+    <text x="120" y="492" font-size="11" fill="#6d6458" font-weight="600" text-anchor="middle">ROTONDA DE LA ESTRELLA · origen de sus fotos 00 y 01</text>
+    <!-- naves este -->
+    <rect x="720" y="90" width="190" height="150" fill="#efe7d4" stroke="#cfc2af"/>
+    <g fill="#3f5878"><rect x="735" y="100" width="12" height="130"/><rect x="765" y="100" width="12" height="130"/><rect x="795" y="100" width="12" height="130"/><rect x="825" y="100" width="12" height="130"/><rect x="855" y="100" width="12" height="130"/></g>
+    <text x="815" y="258" font-size="10" fill="#a89d8e" text-anchor="middle">naves con cubierta fotovoltaica (sin afección)</text>
+    <!-- paño proyectado -->
+    <rect x="150" y="228" width="120" height="14" fill="url(#hatch)" stroke="#c8102e"/>
+    <rect x="136" y="242" width="14" height="80" fill="url(#hatch)" stroke="#c8102e"/>
+    <text x="292" y="34" font-size="11" fill="#c8102e" font-weight="700">paño del lazo: 6 m cara suroeste (calzada) + 6 m cara noroeste (jardín) × 8 m de alto</text>
+    <!-- proyectores + tiros -->
+    <g font-size="12" font-weight="700">
+      <rect x="238" y="352" width="17" height="24" rx="4" fill="#c8102e"/><text x="262" y="369" fill="#c8102e">P1 · cara suroeste</text>
+      <rect x="120" y="366" width="17" height="24" rx="4" fill="#8f0e22"/><text x="60" y="362" fill="#8f0e22">P2 · cara noroeste</text>
+    </g>
+    <g stroke="#c8102e" stroke-width="1.5" opacity=".8">
+      <line x1="246" y1="352" x2="196" y2="242"/><line x1="246" y1="352" x2="258" y2="242"/>
+      <line x1="138" y1="366" x2="150" y2="262"/><line x1="138" y1="366" x2="150" y2="312"/>
+    </g>
+    <text x="330" y="292" font-size="10.5" fill="#c8102e">blend 10 % sobre la esquina · corrección geométrica por software</text>
+    <text x="356" y="404" font-size="10" fill="#6d6458">P1: tiro 26–34 m · P2 desde la glorieta, tiro 30–38 m — ni palmeras ni porche cortan los haces</text>
+  </svg></div>
+  <div class="kpis">
+    <div class="kpi card"><div class="lab">Equipo recomendado</div><div class="val">2<small>×</small>20k<small> lm</small></div><div class="foot">láser · edge-blend 10 % · encierro IP65 climatizado para intemperie</div></div>
+    <div class="kpi card"><div class="lab">Tiro / paño</div><div class="val">26–38 m</div><div class="foot">≈ 60 m² iluminados (6+6 m × 10 m de alto)</div></div>
+    <div class="kpi card"><div class="lab">Consumo</div><div class="val">≈ 950<small> W</small></div><div class="foot">≈ 3 €/noche (12 h, tarifa 3T) · frente a grúa + montaje anual</div></div>
+    <div class="kpi card"><div class="lab">Ventana de uso</div><div class="val">18:00–00:30</div><div class="foot">sensor crepuscular + horario · control desde el móvil</div></div>
+  </div>
+</section>
+
+<section id="escenas">
+  <div class="sec-head"><span class="num">05</span><h2>El mismo equipo, todo el año</h2></div>
+  <p class="sec-lead">Usted mismo lo insinúa en el correo («no se descarta para otros eventos»): con los pies de proyección fijos,
+  cambiar de «vestido» es tan rápido como cambiar una playlist.</p>
+  <div class="escenas">
+    <div class="escena card"><div class="vui-label">Diciembre</div><h3>Lazo y Navidad</h3>
+      <div class="sw"><i style="background:#c8102e"></i><i style="background:#1d6b3c"></i><i style="background:#e0b64f"></i></div>
+      <p>El lazo actual replicado, con brillo de partículas tipo paillette y opción de felicitación en el friso del porche.</p></div>
+    <div class="escena card"><div class="vui-label">Todo el año</div><h3>Corporativo</h3>
+      <div class="sw"><i style="background:#c8102e"></i><i style="background:#2e2a24"></i><i style="background:#f8f5f0;border:1px solid var(--line2)"></i></div>
+      <p>Logotipo animado suave, lazos solidarios (18F, Día contra el Cáncer), visitas de clientes y ferias.</p></div>
+    <div class="escena card"><div class="vui-label">Eventos</div><h3>Celebraciones</h3>
+      <div class="sw"><i style="background:#e0b64f"></i><i style="background:#7c9a92"></i><i style="background:#c8102e"></i></div>
+      <p>Aniversarios, campanadas, lanzamientos de producto con su archivo gráfico de marca.</p></div>
+    <div class="escena card"><div class="vui-label">Discreto</div><h3>Cielo que respira</h3>
+      <div class="sw"><i style="background:#2e2a24"></i><i style="background:#6d6458"></i><i style="background:#a89d8e"></i></div>
+      <p>Movimiento lentísimo sobre el paño, consumo mínimo y sin deslumbramiento hacia la carretera.</p></div>
+  </div>
+</section>
+
+<section id="fases">
+  <div class="sec-head"><span class="num">06</span><h2>Fases y qué proponemos cerrar ahora</h2></div>
+  <div class="card pad" style="max-width:880px">
+    <div class="fases">
+      <div class="fase"><div><h3>Visita técnica y medición</h3><p>Cotas exactas del paño de la torre, validación de los dos tiros con palmeras y porche,
+      opción A (calzada/glorieta, con permiso municipal) o B (jardín propio con mástil), punto de luz. Una mañana.</p></div></div>
+      <div class="fase"><div><h3>Simulación luminotécnica y render final</h3><p>Calibración de este simulador con su foto nocturna real; entregamos el «antes/después» con sus medidas. Semana 1.</p></div></div>
+      <div class="fase"><div><h3>Alquiler o compra del equipo</h3><p>Cotamos los dos escenarios: alquiler de temporada (instatable en 2 semanas) o instalación fija reutilizable todo el año (5–7 semanas).</p></div></div>
+      <div class="fase"><div><h3>Montaje, alineado y corrección de geometría</h3><p>Medio día de tarde, sin afección a la operativa de la sede. Persiana y blend afinados sobre el propio edificio.</p></div></div>
+      <div class="fase"><div><h3>Estreno y temporada</h3><p>Sincronizado con el encendido navideño de la zona; monitorización remota con aviso de fallo y sustitución en 24–48 h.</p></div></div>
+    </div>
+    <div class="nota"><b>Presupuesto:</b> lo cerramos tras la visita, con distancias reales y escenario elegido (alquiler vs compra).
+    Como referencia de mercado: el ciclo anual del lazo físico (grúa, montaje/desmontaje, almacenaje, seguro y sustitución de LED)
+    se mueve en órdenes similares o superiores a un alquiler de temporada de proyección; la compra se amortiza al reutilizarse todo
+    el año. Lo cuantificaremos en la propuesta económica.</div>
+    <a class="cta" href="#simulador" style="margin-top:16px">Volver al simulador para enseñárselo al equipo</a>
+  </div>
+</section>
+</div>
+
+<footer>
+  <div class="wrap"><div class="gridf">
+    <div><span class="mark">ALMA<em>·</em>PROJECTS</span><br>Diseño de espacios con alma · experiencia de marca y entorno</div>
+    <div style="text-align:right">Propuesta técnico-creativa · Grupo Caliche — Sede Central<br>
+    <span style="color:var(--rojo)">Documento de trabajo · medidas y precios orientativos hasta visita técnica · noviembre 2026</span></div>
+  </div></div>
+</footer>
+
+<script src="lib/three.min.js" onerror="var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/three@0.159.0/build/three.min.js';document.head.appendChild(s);"></script>
+<script>
+/* ==================================================================
+   VISOR 3D — Grupo Caliche, replantado sobre ortofoto (1 ud = 1 m)
+   fachada principal al SUROESTE (eje +x), torre en el extremo NO.
+   z = 0 en la fachada; +z hacia la carretera; la rotonda al oeste.
+   ================================================================== */
+(function(){
+  const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+  if(!window.THREE){$('#fall-back').style.display='grid';return;}
+  const T=window.THREE;
+  const host=$('#canvas3d');
+  const renderer=new T.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.outputColorSpace=T.SRGBColorSpace;
+  renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1;
+  renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+  host.appendChild(renderer.domElement);
+  const scene=new T.Scene();
+  const camera=new T.PerspectiveCamera(38,1,.1,1200);
+  const hemi=new T.HemisphereLight(0xffffff,0x6a6050,.9);scene.add(hemi);
+  const sun=new T.DirectionalLight(0xffffff,2);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
+  Object.assign(sun.shadow.camera,{left:-60,right:60,top:50,bottom:-40,near:4,far:220});
+  sun.shadow.bias=-.0005;scene.add(sun,sun.target);
+  const skyC=document.createElement('canvas');skyC.width=4;skyC.height=256;const skyX=skyC.getContext('2d');
+  const skyTex=new T.CanvasTexture(skyC);skyTex.colorSpace=T.SRGBColorSpace;scene.background=skyTex;
+  scene.fog=new T.Fog(0xdde6ea,160,520);
+  const st=o=>new T.MeshStandardMaterial(o);
+  const M={
+    cristal:st({color:0x1c2b38,roughness:.12,metalness:.75}),
+    cristalT:st({color:0x15222e,roughness:.1,metalness:.8}),
+    blanco:st({color:0xece7dc,roughness:.9}),
+    cesped:st({color:0x8f9a68,roughness:1}),
+    cesped2:st({color:0x9aa46e,roughness:1}),
+    arena:st({color:0xcbb98f,roughness:1}),
+    asfalto:st({color:0x6f7375,roughness:1}),
+    valla:st({color:0xdcd6ca,roughness:.85}),
+    metal:st({color:0x9aa0a6,roughness:.4,metalness:.6}),
+    azulPolo:st({color:0x27406b,roughness:.5,metalness:.3}),
+    hoja:st({color:0x4f7048,roughness:.95}),
+    tronco:st({color:0x6f5a3f,roughness:1}),
+    led:st({color:0xfff2c8,emissive:0xffe29a}),
+    rojoLazo:st({color:0xd42020,roughness:.55,emissive:0xd42020}),
+    verdeLazo:st({color:0x1d6b3c,roughness:.55,emissive:0x1d6b3c}),
+    doradoLazo:st({color:0xd9b45e,roughness:.4,metalness:.3,emissive:0xd9b45e}),
+    teja:st({color:0xa8674a,roughness:.9}),
+    invern:st({color:0xdfe8e6,roughness:.3,metalness:.2}),
+    pv:st({color:0x2c3e5c,roughness:.35,metalness:.4}),
+  };
+  const box=(w,h,d,mat,x,y,z)=>{const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;return m;};
+  const put=(m,x,y,z)=>{m.position.set(x,y,z);scene.add(m);return m;};
+  const clamp01=v=>Math.max(0,Math.min(1,v));
+  const smooth=(a,b,x)=>{x=clamp01((x-a)/(b-a));return x*x*(3-2*x);};
+
+  /* ---------- terreno: desierto, campos, rotonda ---------- */
+  put(box(900,.4,900,M.arena,50,-.2,-80));
+  // campos de cultivo + invernaderos al norte (foto 04)
+  for(let i=0;i<7;i++){const f=box(70,.12,26,M.cesped2,-140+i*55,.02,-160-(i%2)*36);f.receiveShadow=true;scene.add(f);
+    for(let k=0;k<5;k++)scene.add(box(9,3.2,20,M.invern,-165+i*55+k*11,1.6,-160-(i%2)*36));}
+  // explanada propia
+  put(box(120,.24,70,M.cesped,20,-.06,-8));
+  // calzada: curva — tramo frente a fachada (z 30..56) + glorieta oeste
+  put(box(360,.28,26,M.asfalto,40,-.01,42));
+  const roton=()=>{const g=new T.Group();
+    const r1=new T.Mesh(new T.TorusGeometry(24,4.2,10,44),M.asfalto);r1.rotation.x=Math.PI/2;r1.position.y=.05;g.add(r1);
+    const isl=new T.Mesh(new T.CylinderGeometry(15,15,1,28),M.cesped);isl.position.y=.5;g.add(isl);
+    const star=(()=>{const s=new T.Shape();const pts=[];for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const r=i%2?5:12;pts.push(new T.Vector2(Math.sin(a)*r,Math.cos(a)*r));}
+      s.setFromPoints(pts);return new T.Mesh(new T.ShapeGeometry(s),st({color:0xb9736a,roughness:.9}));})();
+    star.rotation.x=-Math.PI/2;star.position.y=1.03;g.add(star);
+    for(let i=0;i<5;i++){const p=palmMesh(1.6);const a=i/5*6.283;p.position.set(Math.cos(a)*9,1,Math.sin(a)*9);g.add(p);}
+    g.position.set(-90,.0,44);scene.add(g);};
+  // ramales de la rotonda
+  put(box(34,.26,16,M.asfalto,-116,.03,88));put(box(30,.26,16,M.asfalto,-60,.02,-2));
+  put(box(40,.26,16,M.asfalto,-90,.03,16));
+
+  /* ---------- palmeras (mesh reutilizable) ---------- */
+  function palmMesh(h){const g=new T.Group();
+    const trunk=new T.Mesh(new T.CylinderGeometry(.17,.27,h,8),M.tronco);trunk.position.y=h/2;trunk.castShadow=true;g.add(trunk);
+    for(let k=0;k<6;k++){const f=new T.Mesh(new T.ConeGeometry(.4,2.8,5),M.hoja);const a=k/6*6.283+.2;
+      f.position.set(Math.cos(a)*1.02,h+.15,Math.sin(a)*1.02);f.rotation.set(Math.sin(a)*1.48,0,-Math.cos(a)*1.48);f.castShadow=true;g.add(f);}
+    return g;}
+  const palmera=(x,z,h)=>{const p=palmMesh(h||6.5);p.position.set(x,0,z);scene.add(p);return p;};
+  // jardín de acceso (delante del porche) y grupo oeste hacia la rotonda
+  [ [6,20],[16,22],[26,20],[34,24] ].forEach(([x,z])=>palmera(x,z,5.5));
+  [ [-16,26],[-24,30],[-30,22],[-20,12],[-34,34] ].forEach(([x,z])=>palmera(x,z,6.5));
+  for(const x of[-8,-20,-32])scene.add(box(5,.9,1.2,M.hoja,x,.45,16));
+  // setos geometría del jardín (foto 03): rectángulos de boj
+  for(const[x,z,w,d]of[[-14,2,10,3],[-4,-16,4,12],[40,16,3,8]])scene.add(box(w,.8,d,M.hoja,x,.4,z-6));
+
+  /* ---------- edificio ---------- */
+  const E=new T.Group();scene.add(E);
+  // torre NO (x -9..0, z -30..0), hasta 16.8
+  E.add(box(9,16.8,30,M.cristalT,-4.5,8.4,-15));
+  E.add(box(9.5,.5,30.5,M.cristalT,-4.5,17.05,-15));
+  // casetones escalonados en cubierta junto a la torre (foto 00)
+  E.add(box(4.5,1.9,5,M.cristal,2,17.7,-6));
+  E.add(box(3,1.2,3.4,M.cristal,4.4,18.5,-6.6));
+  // ala de oficinas x 0..35
+  E.add(box(35,4.9,30,M.blanco,17.5,2.45,-15));
+  [6.1,9.5,12.9].forEach(y=>{E.add(box(35,2.3,30.4,M.cristal,17.5,y,-15));
+    E.add(box(35.3,.6,30.7,M.blanco,17.5,y+1.15,-15));});
+  E.add(box(35,1.3,30,M.blanco,17.5,14.9,-15));
+  // porche de columnas en toda la fachada suroeste
+  E.add(box(38,.5,3.4,M.blanco,16,4.9,4.9));
+  for(const x of[-4,2,8,14,20,26,32])E.add(box(.34,4.9,.34,M.blanco,x,2.45,5.8));
+  // logos
+  const logoTex=(()=>{const c=document.createElement('canvas');c.width=640;c.height=180;const x=c.getContext('2d');
+    x.fillStyle='#d51f2c';x.beginPath();x.arc(92,90,66,0,7);x.fill();
+    x.save();x.globalCompositeOperation='destination-out';x.beginPath();x.arc(92,90,32,0,Math.PI*2);x.fill();x.restore();
+    x.strokeStyle='#d51f2c';x.lineWidth=15;x.beginPath();x.arc(92,90,44,-.55,2.1);x.stroke();
+    x.fillStyle='#ffffff';x.font='700 58px Montserrat,Arial';x.fillText('GRUPO',180,76);x.fillText('CALICHE',180,140);
+    const t=new T.CanvasTexture(c);t.colorSpace=T.SRGBColorSpace;return t;})();
+  const lm=()=>st({map:logoTex,transparent:true,roughness:.6});
+  const l1=new T.Mesh(new T.PlaneGeometry(5,1.4),lm());l1.position.set(-6.3,15.6,.08);E.add(l1);
+  const l2=new T.Mesh(new T.PlaneGeometry(5,1.4),lm());l2.rotation.y=Math.PI/2;l2.position.set(-9.08,15.6,-6.5);E.add(l2);
+  const l3=new T.Mesh(new T.PlaneGeometry(2.2,.62),lm());l3.position.set(15,5.6,6.65);E.add(l3);
+  // ventanas de noche
+  const leds=[];const rnd=(a,b)=>a+Math.random()*(b-a);
+  [6.1,9.5,12.9].forEach(y=>{for(let i=0;i<8;i++){const m=new T.Mesh(new T.PlaneGeometry(rnd(1.1,2),rnd(1,1.6)),M.led);
+    m.position.set(1.5+i*4.2+rnd(-.7,.7),y+rnd(-.2,.2),.09);m.visible=false;E.add(m);leds.push(m);}});
+  for(let i=0;i<5;i++){const m=new T.Mesh(new T.PlaneGeometry(1.5,1.5),M.led);m.rotation.y=Math.PI/2;
+    m.position.set(-9.1,rnd(5.5,13.5),rnd(-22,-8));m.visible=false;E.add(m);leds.push(m);}
+  const franjaPorche=new T.Mesh(new T.PlaneGeometry(37,.14),M.led);franjaPorche.position.set(15,4.66,6.63);E.add(franjaPorche);
+  // naves este con fotovoltaica (contexto)
+  const naves=new T.Group();scene.add(naves);
+  for(let i=0;i<3;i++){const b=box(60,8,46,M.teja,78+i*64,4,-30+i*4);naves.add(b);
+    for(let k=0;k<4;k++)naves.add(box(4,.25,34,M.pv,62+i*64+k*12,8.2,-30+i*4));}
+
+  /* ---------- LAZO: esquina NO de la torre (x=-9, z=0) ---------- */
+  const lazo=new T.Group();E.add(lazo);
+  const CX=-9, CZ=0, BAND=11.4, KNOT=11.9;
+  const RM=m=>{m.castShadow=false;return m;};
+  function buildArms(g,face){ // 'so' cara suroeste (z+), 'no' cara noroeste (x-)
+    const add=(w,h,d,x,y,z,rx,rz)=>{const m=box(w,h,d,M.rojoLazo,x,y,z);if(rx)m.rotation.x=rx;if(rz)m.rotation.z=rz;g.add(m);return m;};
+    if(face==='so'){
+      add(5.9,1.3,.32,-6.05,BAND,.3);                    // banda horizontal que cruza la fachada hacia la esquina
+      add(1.25,7.6,.3,-8.2,BAND-4.4,.3);                 // cola vertical junto a la esquina
+      add(.8,4.6,.28,-6.4,BAND-2.9,.32,-.05);            // segunda cola, algo caída
+      // moño: dos lazadas gordas en tijera sobre el nudo
+      add(3.4,1.5,.42,-6.1,KNOT+1.2,.36,0,.42);
+      add(3.4,1.5,.42,-6.1,KNOT+1.2,.36,0,-.42);
+    }else{
+      add(.32,1.3,5.9,CX-.3,BAND,-3.0);                   // banda desde la esquina (z 0..-5.9)
+      add(.3,7.6,1.25,CX-.3,BAND-4.4,-.75);
+      add(.28,4.6,.8,CX-.32,BAND-2.9,-2.35,-.05,0);       // segunda cola
+      add(.42,1.5,3.4,CX-.36,KNOT+1.2,-3.0,.42,0);        // lazadas en tijera
+      add(.42,1.5,3.4,CX-.36,KNOT+1.2,-3.0,-.42,0);
+    }
+  }
+  buildArms(lazo,'so');buildArms(lazo,'no');
+  const knot=new T.Group();knot.position.set(CX,KNOT+1.1,CZ);
+  const k1=box(1.5,1.5,1,null,0,0,0);k1.rotation.y=Math.PI/4;k1.material=M.rojoLazo;knot.add(k1);
+  const k2=box(1.5,1.5,1,M.rojoLazo,0,0,0);knot.add(k2);lazo.add(knot);
+  lazo.traverse(m=>{if(m.isMesh&&!m.material.emissive)m.material=M.rojoLazo;});
+  // paillette
+  const sg=new T.BufferGeometry();const NS=560;const pos=new Float32Array(NS*3);
+  for(let i=0;i<NS;i++){const so=Math.random()<.55;const y=rnd(3,15.2);
+    if(so){pos[i*3]=CX+rnd(.2,5.4);pos[i*3+1]=y;pos[i*3+2]=.4;}else{pos[i*3]=CX-.4;pos[i*3+1]=y;pos[i*3+2]=rnd(-5.6,-.2);}}
+  sg.setAttribute('position',new T.BufferAttribute(pos,3));
+  const sparkle=new T.Points(sg,new T.PointsMaterial({color:0xffd8c0,size:.09,transparent:true,opacity:0}));lazo.add(sparkle);
+
+  /* ---------- lazo físico fantasma ---------- */
+  const faena=new T.Group();faena.visible=false;scene.add(faena);
+  const fmat=st({color:0x9fb0b8,roughness:.4,metalness:.3});
+  faena.add(box(5.6,.85,.22,fmat,-5.9,BAND,.25));faena.add(box(.9,8.4,.22,fmat,-8.3,BAND-4.6,.25));
+  faena.add(box(.22,.85,5.6,fmat,-9.25,BAND,-2.9));faena.add(box(.22,8.4,.9,fmat,-9.25,BAND-4.6,-.5));
+
+  /* ---------- proyectores ---------- */
+  const proyG=new T.Group();scene.add(proyG);
+  let tiro=26;
+  function projectorAt(x,z,tx,ty,tz){
+    const p=new T.Group();
+    p.add(box(.62,.45,.85,M.metal,0,1.6,0));
+    p.add(box(.2,.14,.2,st({color:0x22262b}),0,2.05,0));
+    p.add(box(.55,1.15,.12,st({color:0x22262b}),0,.6,0));
+    for(const[lx,lz]of[[-.26,-.26],[.26,-.26],[0,.32]]){const lg=new T.Mesh(new T.CylinderGeometry(.03,.03,1.15,6),M.metal);lg.position.set(lx,.55,lz);p.add(lg);}
+    p.position.set(x,0,z);proyG.add(p);
+    const from=new T.Vector3(x,1.95,z),to=new T.Vector3(tx,ty,tz);
+    const L=from.distanceTo(to);
+    const cone=new T.Mesh(new T.ConeGeometry(Math.tan(.07)*L,L,20,1,true),
+      new T.MeshBasicMaterial({color:0xffdf9e,transparent:true,opacity:.03,blending:T.AdditiveBlending,depthWrite:false,side:T.DoubleSide}));
+    const dir=to.clone().sub(from);
+    cone.position.copy(from).addScaledVector(dir,.5);
+    cone.quaternion.setFromUnitVectors(new T.Vector3(0,-1,0),dir.clone().normalize());
+    cone.userData.mat=cone.material;proyG.add(cone);}
+  function placeProjectors(){
+    const s=(tiro-26);
+    projectorAt(2.2+s*.4, 29+s*.7, -6.2,BAND+1,.4);             // P1 · cara suroeste (desde arcén de la calzada)
+    projectorAt(-20-s*.5, 27+s*.7, CX,BAND,-2.6);               // P2 · cara noroeste (desde glorieta)
+  }
+  placeProjectors();
+  // farolas viales y poste azul
+  const poste=(x,z,h,mat,arm)=>{const g=new T.Group();g.add(box(.14,h,.14,mat||M.metal,0,h/2,0));
+    if(arm){g.add(box(.1,.1,1.5,mat||M.metal,0,h-.1,.75));const b=new T.Mesh(new T.SphereGeometry(.15,10,8),M.led);
+      b.position.set(0,h-.25,1.4);g.add(b);b.userData.lamp=true;}
+    g.position.set(x,0,z);scene.add(g);return g;};
+  const faros=[poste(14,30,7.5,M.metal,1),poste(-40,30,7.5,M.metal,1),poste(-70,58,6.5,M.azulPolo,0)];
+  // torreon eléctrico NO (fotos 00/01)
+  const torreon=new T.Group();for(const dy of[4,10,16]){torreon.add(box(3.4,.15,.15,M.metal,0,dy,0));torreon.add(box(.15,.15,3.4,M.metal,0,dy,0));}
+  for(const[lx,lz]of[[1.3,1.3],[-1.3,1.3],[1.3,-1.3],[-1.3,-1.3]])torreon.add(box(.16,17,.16,M.metal,lx,8.5,lz));
+  torreon.position.set(-56,0,2);scene.add(torreon);
+
+  /* ---------- modelo de luz ---------- */
+  const LUX=[[7,1.1],[8,1400],[9,9500],[10,25000],[11,42000],[12,53000],[13,50000],[14,40000],[15,26000],[16,13000],[17,4200],[17.7,1000],[18.1,150],[18.5,20],[19,3.5],[20,1.1],[24,.5]];
+  const luxAt=h=>{for(let i=0;i<LUX.length-1;i++){const[a,va]=LUX[i],[b,vb]=LUX[i+1];if(h<=b)return va+(vb-va)*(h-a)/(b-a);}return .5;};
+  const RHO=.12; let lum=40000;
+  function calc(h){const A=60*(tiro/26)**2;
+    const Lp=lum*.85*RHO/(Math.PI*A);
+    const Lbg=Math.max(luxAt(h),2.5)*RHO/Math.PI;
+    return{Lp,Lbg,c:Lp/Lbg,A};}
+  const SKY=[[0,[9,16,33],[6,10,20]],[5.8,[9,16,33],[6,10,20]],[6.3,[46,58,86],[90,74,66]],[7,[122,150,186],[196,180,158]],
+    [9,[148,186,222],[214,208,190]],[13,[158,196,232],[222,218,202]],[16.5,[150,178,210],[214,196,166]],[18,[96,90,116],[188,120,84]],
+    [18.8,[44,50,80],[110,70,70]],[19.5,[15,23,41],[26,33,50]],[24,[9,16,33],[6,10,20]]];
+  function sky(h){for(let i=0;i<SKY.length-1;i++){const[a,ca,ta]=SKY[i],[b,cb,tb]=SKY[i+1];
+    if(h<=b){const t=(h-a)/(b-a),f=(p,q)=>p.map((v,k)=>Math.round(v+(q[k]-v)*t));return{zen:f(ca,cb),hor:f(ta,tb)};}}
+    return{zen:SKY[0][1],hor:SKY[0][2]};}
+  roton(); // glorieta con palmeras (palmMesh está declarada más abajo, es hoisted)
+  let hora=19.5;
+  const BG=new T.Color(),RED=new T.Color();
+  function update(){
+    const h=hora,l=luxAt(h),day=clamp01((l-3)/24000),night=1-day;
+    const s=sky(h);
+    const g=skyX.createLinearGradient(0,0,0,256);
+    g.addColorStop(0,`rgb(${s.zen.join(',')})`);g.addColorStop(.75,`rgb(${s.hor.join(',')})`);
+    g.addColorStop(1,`rgb(${s.hor.map(v=>v*.88|0).join(',')})`);
+    skyX.fillStyle=g;skyX.fillRect(0,0,4,256);skyTex.needsUpdate=true;
+    scene.fog.color.setStyle(`rgb(${s.hor.join(',')})`);
+    renderer.toneMappingExposure=.8+.32*day;
+    sun.intensity=2.6*day;
+    const alt=Math.max(0,1-Math.abs(h-13)/6.6),az=(h-13)*.17;
+    sun.position.set(30+Math.sin(az)*60,alt*55+10,60+Math.cos(az)*60);sun.target.position.set(-2,8,-10);
+    hemi.intensity=.42+.6*day;
+    leds.forEach(m=>m.visible=night>.9);
+    franjaPorche.visible=night>.72;
+    faros.forEach(f=>f.traverse(o=>{if(o.userData&&o.userData.lamp)o.visible=night>.5;}));
+    const{Lp,Lbg,c,A}=calc(h);
+    const vis=smooth(.012,.3,c);
+    const faceBase=BG.setRGB(.08+.15*day,.11+.17*day,.14+.19*day);
+    for(const mat of[M.rojoLazo,M.verdeLazo,M.doradoLazo]){
+      const base=mat===M.verdeLazo?RED.setHex(0x1d6b3c):mat===M.doradoLazo?RED.setHex(0xd9b45e):RED.setHex(0xd42020);
+      mat.emissive.copy(base);
+      mat.emissiveIntensity=vis*(.32+.92*night);
+      mat.color.copy(faceBase).lerp(base,clamp01(vis*.9+.05));}
+    sparkle.material.opacity=clamp01(vis*night*1.15)*.95;
+    proyG.children.forEach(c=>{if(c.userData.mat)c.userData.mat.opacity=night*.03;});
+    const txt=c>=1?'×'+c.toFixed(0):Math.round(c*100)+' %';
+    $('#stPct').textContent=txt;
+    $('#stPct').style.color=c<.04?'var(--rojo)':c<.12?'#8a6b3f':'var(--verde)';
+    const v=c<.04?['No apreciable','var(--rojo)']:c<.12?['Se intuye','var(--dorado)']:c<.3?['Visible','var(--salvia)']:['Pleno','var(--verde)'];
+    $('#stVer').textContent=v[0];$('#stVer').style.background=v[1];
+    $('#stSub').innerHTML=`Proyectado <b>${Lp.toFixed(1)} cd/m²</b> · fondo <b>${Lbg<10?Lbg.toFixed(1):Math.round(Lbg)} cd/m²</b> · ${Math.round(l).toLocaleString('es')} lux · paño ${A.toFixed(0)} m²`;
+    drawCurve(h);
+  }
+  function drawCurve(mark){
+    const svg=$('#curva');if(!svg)return;
+    const W=640,H=300,PL=44,PR=14,PT=14,PB=30;
+    const xs=h=>PL+(h-7)/(24-7)*(W-PL-PR);
+    const yt=Math.log10(.004),yb=Math.log10(40);
+    const ys=c=>H-PB-(Math.log10(Math.max(c,.004))-yt)/(yb-yt)*(H-PT-PB);
+    let path='';for(let h=7;h<=24;h+=.2){const c=calc(h).c;path+=(path?'L':'M')+xs(h).toFixed(1)+' '+ys(c).toFixed(1)+' ';}
+    svg.innerHTML=`
+      <rect x="${xs(9.2)}" y="${PT}" width="${xs(16.6)-xs(9.2)}" height="${H-PT-PB}" fill="#f6efe2"/>
+      <rect x="${xs(18.2)}" y="${PT}" width="${xs(24)-xs(18.2)}" height="${H-PT-PB}" fill="rgba(29,107,60,.10)"/>
+      <line x1="${xs(17.9)}" y1="${PT}" x2="${xs(17.9)}" y2="${H-PB}" stroke="#c8102e" stroke-dasharray="4 4"/>
+      <text x="${xs(18)}" y="${PT+12}" font-size="10" fill="#c8102e" font-weight="600">ocaso civil 18:06</text>
+      <line x1="${xs(7)}" y1="${ys(.1)}" x2="${xs(24)}" y2="${ys(.1)}" stroke="#e0b64f" stroke-dasharray="2 5"/>
+      <text x="${PL+3}" y="${ys(.1)-4}" font-size="9.5" fill="#8a6b3f">legible ≈ 10 %</text>
+      <line x1="${xs(7)}" y1="${ys(.03)}" x2="${xs(24)}" y2="${ys(.03)}" stroke="#a89d8e" stroke-dasharray="2 5"/>
+      <text x="${PL+3}" y="${ys(.03)-4}" font-size="9.5" fill="#a89d8e">apreciable 3 %</text>
+      <path d="${path}" fill="none" stroke="#2e2a24" stroke-width="2.4"/>
+      <circle cx="${xs(mark)}" cy="${ys(calc(mark).c)}" r="6" fill="#c8102e" stroke="#fff" stroke-width="2"/>
+      <text x="${xs(mark)}" y="${ys(calc(mark).c)-12}" font-size="11" fill="#c8102e" font-weight="700" text-anchor="middle">${calc(mark).c<1?Math.round(calc(mark).c*100)+' %':'×'+Math.round(calc(mark).c)}</text>
+      ${[8,10,12,14,16,18,20,22].map(h=>`<text x="${xs(h)}" y="${H-8}" font-size="10" fill="#a89d8e" text-anchor="middle">${h}h</text>`).join('')}
+      <text x="16" y="170" font-size="10" fill="#6d6458" transform="rotate(-90 16 170)">contraste (escala log)</text>`;
+  }
+
+  /* ---------- cámara orbital ---------- */
+  const CAM={rotonda:{t:[-5,9.6,-1],r:44,th:-.62,ph:1.46},calle:{t:[-1,8.8,-1],r:48,th:.34,ph:1.34},
+    este:{t:[6,8.5,-6],r:62,th:.9,ph:1.5},dron:{t:[-4.5,10,-6],r:48,th:-.5,ph:1.08},cenital:{t:[2,0,6],r:190,th:.16,ph:.11}};
+  const cur={t:new T.Vector3(...CAM.calle.t)};let sph={r:CAM.calle.r,th:CAM.calle.th,ph:CAM.calle.ph};
+  let fly=null;
+  function go(k){const c=CAM[k];if(!c)return;
+    fly={s0:{...sph},s1:{r:c.r,th:c.th,ph:c.ph},t0:cur.t.clone(),t1:new T.Vector3(...c.t),ini:performance.now()};}
+  const dom=renderer.domElement;const ptrs=new Map();let drag=null,pinch=0;
+  dom.addEventListener('pointerdown',e=>{ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});drag=e.button===2?'pan':'rot';fly=null;
+    if(ptrs.size===2){const[a,b]=[...ptrs.values()];pinch=Math.hypot(a.x-b.x,a.y-b.y);}});
+  dom.addEventListener('pointermove',e=>{const p=ptrs.get(e.pointerId);if(!p)return;const dx=e.clientX-p.x,dy=e.clientY-p.y;p.x=e.clientX;p.y=e.clientY;
+    if(ptrs.size===2){const[a,b]=[...ptrs.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch&&d)sph.r=Math.max(14,Math.min(160,sph.r*pinch/d));pinch=d;return;}
+    if(drag==='rot'){sph.th-=dx*.0045;sph.ph=Math.max(.05,Math.min(1.74,sph.ph-dy*.0045));}
+    else{const r=sph.r*.0018;const right=new T.Vector3().setFromMatrixColumn(camera.matrix,0);
+      cur.t.addScaledVector(right,-dx*r);cur.t.y+=dy*r;
+      cur.t.x=Math.max(-80,Math.min(90,cur.t.x));cur.t.z=Math.max(-60,Math.min(90,cur.t.z));}});
+  const up=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch=0;if(!ptrs.size)drag=null;};
+  dom.addEventListener('pointerup',up);dom.addEventListener('pointercancel',up);
+  dom.addEventListener('wheel',e=>{e.preventDefault();fly=null;sph.r=Math.max(14,Math.min(160,sph.r*Math.exp(e.deltaY*.0011)));},{passive:false});
+  dom.addEventListener('contextmenu',e=>e.preventDefault());
+  function tam(){const w=host.clientWidth||800,h=host.clientHeight||600;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
+  new ResizeObserver(tam).observe(host);tam();
+
+  /* ---------- UI ---------- */
+  $('#hora').addEventListener('input',e=>{hora=+e.target.value;const hh=Math.floor(hora),mm=Math.round(hora%1*60);
+    $('#reloj').textContent=String(hh).padStart(2,'0')+':'+String(mm===60?0:mm).padStart(2,'0');update();});
+  $$('#vTime .hitos b').forEach(b=>b.addEventListener('click',()=>{hora=+b.dataset.h;$('#hora').value=hora;
+    $('#hora').dispatchEvent(new Event('input'));go(hora<16?'calle':'dron');}));
+  const segOn=(sel,fn)=>{$(sel).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+    $$(sel+' button').forEach(x=>x.classList.toggle('on',x===b));fn(b);});};
+  segOn('#segCam',b=>go(b.dataset.c));segOn('#segCam2',b=>go(b.dataset.c));
+  segOn('#segLum',b=>{lum=+b.dataset.l;update();});
+  segOn('#segDist',b=>{tiro=+b.dataset.d;while(proyG.children.length)proyG.remove(proyG.children[0]);placeProjectors();proyG.visible=$('#chProy').checked;update();});
+  segOn('#segEsc',b=>{const e=b.dataset.e;const mat=e==='corp'?M.doradoLazo:e==='navidad'?M.verdeLazo:M.rojoLazo;
+    lazo.traverse(m=>{if(m.isMesh)m.material=mat;});sparkle.material.color.set(e==='corp'?0xfff0c0:0xffd8c0);update();});
+  $('#chProy').addEventListener('change',e=>proyG.visible=e.target.checked);
+  $('#chFaena').addEventListener('change',e=>{faena.visible=e.target.checked;lazo.visible=!e.target.checked;sparkle.visible=!e.target.checked;update();});
+  $$('.galeria figure').forEach(f=>f.addEventListener('click',()=>{go(f.dataset.c);
+    $$('#segCam button').forEach(b=>b.classList.toggle('on',b.dataset.c===f.dataset.c));
+    $$('#segCam2 button').forEach(b=>b.classList.toggle('on',b.dataset.c===f.dataset.c));
+    $('#simulador').scrollIntoView({behavior:'smooth'});}));
+
+  /* ---------- comparador fotos ---------- */
+  (function(){const c=$('#compa');if(!c)return;const capa=$('#capaInf'),asa=$('#asa');
+    function set(f){f=Math.max(.02,Math.min(.98,f));asa.style.left=f*100+'%';capa.style.clipPath=`inset(0 0 0 ${f*100}%)`;}
+    set(.45);
+    asa.addEventListener('pointerdown',e=>{asa.setPointerCapture(e.pointerId);asa._d=true;});
+    asa.addEventListener('pointermove',e=>{if(!asa._d)return;const r=c.getBoundingClientRect();set((e.clientX-r.left)/r.width);});
+    asa.addEventListener('pointerup',()=>asa._d=false);})();
+
+  /* ---------- bucle ---------- */
+  let sparkT=0;
+  function loop(now){requestAnimationFrame(loop);
+    if(fly){let k=clamp01((now-fly.ini)/1100);k=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      const Lp=(a,b)=>a+(b-a)*k;
+      sph.r=Lp(fly.s0.r,fly.s1.r);sph.th=Lp(fly.s0.th,fly.s1.th);sph.ph=Lp(fly.s0.ph,fly.s1.ph);
+      cur.t.lerpVectors(fly.t0,fly.t1,k);if(k>=1)fly=null;}
+    const off=new T.Vector3(Math.sin(sph.ph)*Math.sin(sph.th),Math.cos(sph.ph),Math.sin(sph.ph)*Math.cos(sph.th)).multiplyScalar(sph.r);
+    camera.position.copy(cur.t).add(off);
+    if(camera.position.y<1.4)camera.position.y=1.4;
+    camera.lookAt(cur.t);
+    sparkT+=.03;sparkle.material.size=.075+.04*Math.abs(Math.sin(sparkT));
+    renderer.render(scene,camera);}
+  update();requestAnimationFrame(loop);
+  window.__caliche={go,update};
+})();
+</script>
+</body>
+</html>
